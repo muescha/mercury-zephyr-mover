@@ -20,6 +20,7 @@ require 'yaml'
 
 @state = nil
 @active = false
+@help_active = false
 
 @mash = ['cmd', 'alt', 'ctrl']
 
@@ -72,9 +73,9 @@ class API
   class << self
     def log(*args)
       args.each do |arg|
-        pp arg
+        #pp arg
       end
-      STDOUT.flush
+      #STDOUT.flush
     end
   end
 end
@@ -102,6 +103,9 @@ end
 # ----------------------------------------
 
 def unbind_window_moving
+
+  @state = nil
+
   @move_mods.each do |weight, mods|
     @move_dir.each do |dir, direction|
       API.unbind dir, mods
@@ -185,8 +189,6 @@ end
 def unbind_mercury_zephyr_mover_states
   unbind_window_moving
 
-  @state = nil
-
   @states.each do |key, state|
     API.unbind key, @mash
   end
@@ -234,6 +236,9 @@ end
 
 def bind_set_memory
   API.bind 'RETURN', @mash do
+
+    unbind_window_moving
+
     state_info 'Save to Memory:'
 
     memory = read_memory
@@ -242,18 +247,23 @@ def bind_set_memory
 
     frame = API.focused_window.frame
 
+    unbind_escape
+
     API.choose_from list, "Save to Memory #{frame.description}", 10, 50 do |list_index|
 
-      key = list[list_index][0]
+      if list_index
+        key = list[list_index][0]
 
-      memory[key] = frame
+        memory[key] = frame
 
-      unbind_read_memory
-      save_memory memory
-      bind_read_memory
+        unbind_read_memory
+        save_memory memory
+        bind_read_memory
 
-      API.alert "Saved Window to key #{key} for #{frame.description}"
-      API.log memory.to_yaml
+        API.alert "Saved Window to key #{key} for #{frame.description}"
+        API.log memory.to_yaml
+      end
+
       state_info
       stop_mercury_zephyr_mover
     end
@@ -272,18 +282,24 @@ end
 
 def bind_select_memory
   API.bind 'TAB', @mash do
-    API.log 'tab'
+
+    unbind_window_moving
+
     state_info 'Select from Memory:'
     memory = read_memory
 
     list = memory.map { |key, frame| "#{key}: #{frame.description}" }
 
+    unbind_escape
+
     API.choose_from list, 'Select from Memory', 10, 100 do |list_index|
 
-      frame = memory[list[list_index][0]]
-      API.alert "Set Window to #{frame.description}"
+      if list_index
+        frame = memory[list[list_index][0]]
+        API.alert "Set Window to #{frame.description}"
 
-      manipulate_frame { frame }
+        manipulate_frame { frame }
+      end
 
       state_info
       stop_mercury_zephyr_mover
@@ -302,30 +318,40 @@ end
 
 def bind_delete_memory
   API.bind 'DELETE', @mash do
+
+    unbind_window_moving
+
     state_info 'Delete from Memory:'
     memory = read_memory
 
     list = memory.map { |key, frame| "#{key}: #{frame.description}" }
 
+    unbind_escape
+
     API.choose_from list, 'Delete from Memory', 10, 100 do |list_index|
 
-      key = list[list_index][0]
+      if list_index
+        key = list[list_index][0]
 
-      memory.delete key
+        memory.delete key
 
-      unbind_read_memory
-      save_memory memory
-      bind_read_memory
+        unbind_read_memory
+        save_memory memory
+        bind_read_memory
 
-      API.log memory.to_yaml
-      API.alert "Delete Window for key #{key}"
+        API.log memory.to_yaml
+        API.alert "Delete Window for key #{key}"
+      end
+
       state_info
+      stop_mercury_zephyr_mover
     end
   end
 end
 
-
-# saved windows
+# ----------------------------------------
+# create shortcuts for saved windows
+# ----------------------------------------
 
 def unbind_read_memory
   memory = read_memory
@@ -397,12 +423,19 @@ end
 
 def unbind_help
   API.unbind '.', @mash
+  @help_active = false
 end
 
 def bind_help
   API.bind '.', @mash do
 
-    API.show_box "" +
+    if @help_active
+      API.hide_box
+      @help_active = false
+    else
+      @help_active = true
+
+      API.show_box "" +
 
 "MercuryZephyrMover: Help
 
@@ -422,7 +455,8 @@ def bind_help
 
         Movement shortcuts: modifier + direction
             modifier:
-                       cmd = 100px
+                       none = 100px
+                       cmd =  50px
                 alt+cmd =  10px
                 alt          =   1px
             direction: ( ↑ ← → ↓)
@@ -438,7 +472,7 @@ def bind_help
         Memory file (settings in file 'zephyros/config.rb'):
 
             #{@memory_file}"
-                     
+    end
   end
 end
 
