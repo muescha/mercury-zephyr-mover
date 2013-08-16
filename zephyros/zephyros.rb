@@ -278,14 +278,14 @@ end
 
 def unbind_select_memory
   API.unbind 'TAB', @mash
-  API.unbind "''", @mash
+  API.unbind "'", @mash
 end
 
 def bind_select_memory
   API.bind 'TAB', @mash do
     select_memory
   end
-  API.bind "''", @mash do
+  API.bind "'", @mash do
     select_memory
   end
 end
