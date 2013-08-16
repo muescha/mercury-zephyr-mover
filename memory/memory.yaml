@@ -1,0 +1,26 @@
+---
+C: !ruby/struct:Rect
+  x: 541
+  y: 22
+  w: 1379
+  h: 1178
+X: !ruby/struct:Rect
+  x: 41
+  y: 22
+  w: 1879
+  h: 1178
+Z: !ruby/struct:Rect
+  x: 41
+  y: 22
+  w: 496
+  h: 1178
+V: !ruby/struct:Rect
+  x: 841
+  y: 22
+  w: 1079
+  h: 1178
+T: !ruby/struct:Rect
+  x: 851
+  y: 22
+  w: 1069
+  h: 1178
