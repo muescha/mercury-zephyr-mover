@@ -20,7 +20,7 @@ Help: `ctrl+alt+cmd+.`
 
 ## Special Commands
 
-Apply to all Child windows: ctrl+alt+cmd+\\
+Apply to all Child windows: `ctrl+alt+cmd+\`
 
 
 ## Select Movement Direction:
