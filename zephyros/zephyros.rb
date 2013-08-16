@@ -278,34 +278,42 @@ end
 
 def unbind_select_memory
   API.unbind 'TAB', @mash
+  API.unbind "''", @mash
 end
 
 def bind_select_memory
   API.bind 'TAB', @mash do
-
-    unbind_window_moving
-
-    state_info 'Select from Memory:'
-    memory = read_memory
-
-    list = memory.map { |key, frame| "#{key}: #{frame.description}" }
-
-    unbind_escape
-
-    API.choose_from list, 'Select from Memory', 10, 100 do |list_index|
-
-      if list_index
-        frame = memory[list[list_index][0]]
-        API.alert "Set Window to #{frame.description}"
-
-        manipulate_frame { frame }
-      end
-
-      state_info
-      stop_mercury_zephyr_mover
-    end
+    select_memory
+  end
+  API.bind "''", @mash do
+    select_memory
   end
 end
+
+def select_memory
+  unbind_window_moving
+
+  state_info 'Select from Memory:'
+  memory = read_memory
+
+  list = memory.map { |key, frame| "#{key}: #{frame.description}" }
+
+  unbind_escape
+
+  API.choose_from list, 'Select from Memory', 10, 100 do |list_index|
+
+    if list_index
+      frame = memory[list[list_index][0]]
+      API.alert "Set Window to #{frame.description}"
+
+      manipulate_frame { frame }
+    end
+
+    state_info
+    stop_mercury_zephyr_mover
+  end
+end
+
 
 
 # ----------------------------------------
@@ -466,6 +474,7 @@ def bind_help
         Shortcuts:
             Save    : ctrl+alt+cmd+return
             Select  : ctrl+alt+cmd+tab
+                      ctrl+alt+cmd+'
             Delete : ctrl+alt+cmd+delete
             Use     : ctrl+alt+cmd+[saved key]
 

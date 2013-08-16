@@ -59,7 +59,7 @@ Cursor keys: `↑ ← → ↓`
 
 Save: `ctrl+alt+cmd+return`
 
-Select: `ctrl+alt+cmd+tab`
+Select: `ctrl+alt+cmd+tab` or `ctrl+alt+cmd+'`
 
 Delete: `ctrl+alt+cmd+delete`
 
